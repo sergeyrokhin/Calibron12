@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(Calibron12 CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(Calibron12_CPP_FILES src/main.cpp src/Calibron12.cpp src/rectangle.cpp src/Solution.cpp)
+set(Calibron12_H_FILES src/Solution.h src/rectangle.h ) 
+
+add_executable(${PROJECT_NAME} ${Calibron12_CPP_FILES} ${Calibron12_H_FILES})
+
+set(PROJECT_NAME_TEST ${PROJECT_NAME}_TEST ) 
+
+set(Calibron12_TEST_CPP_FILES src_test/main.cpp src_test/rectangle_test.cpp)
+
+add_executable(PROJECT_NAME_TEST ${Calibron12_TEST_CPP_FILES} ${Calibron12_H_FILES})
+target_include_directories(PROJECT_NAME_TEST
+ PRIVATE
+  src/
+  )
