@@ -12,4 +12,4 @@ ofstream OpenOutputFile(const string& file_name);
 
 void AddRectangle(Document& doc, const RectanglePlacement& rect);
 
-void Print(const Calibron12Box& pl_set, std::vector<unsigned>& order, unsigned& variation, const RectangleSet& rs);
+void Print(const CalibronBox& pl_set, std::vector<unsigned>& order, unsigned& variation);

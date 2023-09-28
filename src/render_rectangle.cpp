@@ -29,6 +29,7 @@ void AddRectangle(Document& doc, const RectanglePlacement& rect)
 
     auto dx = rect.x2 - rect.x1;
     auto dy = rect.y2 - rect.y1;
+    string name = to_string(dx) + "x"s + to_string(dy);
     if (dx < dy)
     {
         auto temp = dx;
@@ -54,7 +55,6 @@ void AddRectangle(Document& doc, const RectanglePlacement& rect)
     polyline.SetStrokeColor(black_color);
     doc.Add(move(polyline));
 
-    string name = to_string(dx) + "x"s + to_string(dy);
     doc.Add(Text().SetPosition({ p_x1 + PIXEL_PER_POINT, p_y1 + PIXEL_PER_POINT })
         .SetFontFamily("Verdana"s)
         .SetFontSize(12)
@@ -65,7 +65,7 @@ void AddRectangle(Document& doc, const RectanglePlacement& rect)
 
 }
 
-void Print(const Calibron12Box& pl_set, std::vector<unsigned>& order, unsigned& variation, const RectangleSet& rs)
+void Print(const CalibronBox& pl_set, std::vector<unsigned>& order, unsigned& variation)
 {
     string name_file(order.size(), ' ');
     name_file.reserve(20);
@@ -73,26 +73,15 @@ void Print(const Calibron12Box& pl_set, std::vector<unsigned>& order, unsigned& 
     {
         name_file[i] = 'A' + order[i];
     }
-    name_file = "svg/"s + name_file + to_string(variation);
+    //name_file = "svg/"s + name_file + to_string(variation);
+    name_file = name_file + to_string(variation);
     Document doc;
     auto fout = OpenOutputFile(name_file);
     RenderContext out(fout);
-    size_t l = 0;
-    for (size_t i = 0; i < 4; i++)
-    {
-        for (const auto j : pl_set[i])
+        for (const auto &j : pl_set)
         {
             AddRectangle(doc, j);
-            ++l;
         }
-    }
-    Placement pl = { 0 , MAIN_SIDE_WIDTH + 5};
-
-    for (size_t i = l; i < rs.size(); i++)
-    {
-        AddRectangle(doc, RectanglePlacement(rs [order[i]], pl));
-        pl[0] += 33;
-    }
 
     doc.Render(out);
 

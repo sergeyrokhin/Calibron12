@@ -30,9 +30,12 @@ public:
 		: x1(x1), x2(x2), y1(y1), y2(y2)
 	{
 	}
+	unsigned Weight() const;
+	bool operator<(const RectanglePlacement& other) const;
 };
 
 using Calibron12Box = std::array<std::vector<RectanglePlacement>, 4>;
+using CalibronBox = std::vector<RectanglePlacement>;
 
 std::ostream& operator<<(std::ostream& out, const Rectangle& c);
 
@@ -46,19 +49,11 @@ unsigned GetNumberSide(unsigned variation, unsigned number);
 //старшие разряды (number) не трогаем, в хвосте "перевернем" (12 - number)
 unsigned TearTail(unsigned variation, unsigned number);
 
-unsigned GetSideWidth(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned variation, unsigned number);
-
-//функция должна найти минимальную сторону из последних фигурок, которые не у стены
-// это позволит отсеять вариант, если в решении есть слишком узкие места
-unsigned GetMinSide(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned number);
-
-
-bool TooTight(const Calibron12Box& rect_plasements, unsigned min);
-
 std::pair<unsigned, unsigned> GetRectangle(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned variation, unsigned number);
-
 
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& a);
 
 bool IsIntersect(const RectanglePlacement &a, const RectanglePlacement &b);
+bool NextFreePosition(Placement& pl, const CalibronBox& rect_plasements);
+bool Fit(const RectanglePlacement& rect, const CalibronBox& rect_plasements);

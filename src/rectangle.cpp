@@ -1,5 +1,5 @@
 #include "rectangle.h"
-#include "rectangle.h"
+
 
 const unsigned MAIN_SIDE_WIDTH = 56;
 const unsigned END_OF_VARIATION = (1 << 12); // 1 0000 0000 0000 в двоичной
@@ -8,6 +8,12 @@ std::ostream& operator<<(std::ostream& out, const Rectangle& c) {
 	out << '[' << c[0] << "x" << c[1] << ']';
 	return out;
 }
+
+std::ostream& operator<<(std::ostream& out, const RectanglePlacement& c) {
+	out << '[' << (c.x2 - c.x1) << "x" << (c.y2 - c.y1) << ']';
+	return out;
+}
+
 
 template <typename T>
 std::ostream& operator<<(std::ostream& out, const std::vector<T>& a) {
@@ -68,6 +74,17 @@ RectanglePlacement::RectanglePlacement(Rectangle rect, unsigned side_number, uns
 }
 
 
+unsigned RectanglePlacement::Weight() const
+{
+	return x1 * 11 + y1 * 7 + x2 * 5 + y2 * 3;
+}
+
+bool RectanglePlacement::operator<(const RectanglePlacement& other) const
+{
+	return Weight() < other.Weight();
+}
+
+
 unsigned GetNumberSide(unsigned variation, unsigned number) {
 	number = 12 - 1 - number;
 	auto side_number = (variation >> number) % 2;
@@ -91,16 +108,11 @@ unsigned TearTail(unsigned variation, unsigned number) {
 	return variation;
 }
 
-
-unsigned GetSideWidth(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned variation, unsigned number) {
-	return rs[order[number]][GetNumberSide(variation, number)];
-}
-
-bool Inside(const Placement &pl, const RectanglePlacement &rect_pl) {
+bool Inside(const Placement& pl, const RectanglePlacement& rect_pl) {
 	return (rect_pl.x1 <= pl[0] && pl[0] < rect_pl.x2 && rect_pl.y1 <= pl[1] && pl[1] < rect_pl.y2); //точка внутри прямоугольника, не на границе
 }
 
-bool PlacementIsBusy(const Placement &pl, const Calibron12Box& cb) {
+bool PlacementIsBusy(const Placement& pl, const Calibron12Box& cb) {
 	for (const auto& i : cb) //по каждой стороне
 	{
 		for (const auto& j : i) // каждый прямоугольник
@@ -135,7 +147,7 @@ bool FirstFree(Placement& pl, bool vertically, const Calibron12Box& rect_plaseme
 					//передвигаемся за прямоугольник
 					pl[vertically] = (vertically ? j.y2 : j.x2); //на следующую после этого прямоугольника
 					//повтор цикла по i
-					i = - 1;
+					i = -1;
 					search_has_changed = true;
 					//не свободный, передвинулись, значит нужно снова вернуться на
 					// начало цикла while 
@@ -173,48 +185,6 @@ bool LastFree(Placement& pl, bool vertically, const Calibron12Box& rect_plasemen
 	//невозможно выйти за пределы поля.
 	assert(false);
 	return false; //нашли
-}
-
-unsigned GetMinSide(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned number)
-{
-	unsigned min = 18; //21x18 это максимальный размер для минимальной, но можно и 56 записать, заведомо будет меньше
-	for (size_t i = number; i < 12; i++)
-	{
-		for (size_t j = 0; j < 2; j++)
-		{
-			if (rs[order[i]][j] < min)
-			{
-				min = rs[order[i]][j];
-			}
-		}
-	}
-	return min;
-}
-
-// Эту щель никто не закроет
-bool TooTight(const Calibron12Box& rect_plasements, unsigned min)
-{
-	// все стенки заняты, свободной может быть только дальше от стены на 4
-	for (unsigned d = 3; d < MAIN_SIDE_WIDTH - 4; d++) //проверяем каждую
-	{
-		//vertically == 0 - проверяем строки, перебирая каждый слой по оси "y"
-		for (size_t vertically = 0; vertically < 2; vertically++) //горизонталь и вертикаль
-		{
-			Placement point = { 3, 3 };
-			//
-			point[(vertically + 1) % 2] = d;
-			while (FirstFree(point, vertically, rect_plasements))
-			{
-				unsigned start_free = point[vertically];
-				LastFree(point, vertically, rect_plasements);
-				if (min > point[vertically] - start_free)
-				{
-					return true;
-				}
-			}
-		}
-	}
-	return false;
 }
 
 
@@ -264,26 +234,61 @@ bool IsIntersect(const RectanglePlacement& a, const RectanglePlacement& b)
 	// Достаточно найти пересечение либо по вертикали, либо по горизонтали
 	// Если есть пересечение, то либо a пересекает b по горизонтали, либо b пересекает a
 	// Проверяем только вертикальное пересечение, a -> b потом b -> a
-
-	return (IsIntersectAB(a, b) || IsIntersectAB(b, a));
+	//if (a.x2 <= MAIN_SIDE_WIDTH && a.y2 <= MAIN_SIDE_WIDTH && b.x2 <= MAIN_SIDE_WIDTH && b.y2 <= MAIN_SIDE_WIDTH)
+	//{
+		return (IsIntersectAB(a, b) || IsIntersectAB(b, a));
+	//}
+	//return true;
 }
 
-namespace
-{
-	//процедуры попытки найти место для каждого прямоугольника
-	//для этого находим все пустые углы
-	//каждый должен быть занят хотя бы один раз
-	//каждому прямоугольнику, которые в хвосте (от number до 12) нужно сопоставить хоть один угол
-	struct Corner {
-		Placement pl;
-
-	};
-
-
-	bool IsCorrectCorners(const Calibron12Box & rect_plasements, const RectangleSet & rs, unsigned number) {
+	bool NextFreePosition(Placement& pl, const CalibronBox& rect_plasements) {
+		while (pl[1] < MAIN_SIDE_WIDTH)
+		{
+			bool search_complited = true;
+			for (const auto& j : rect_plasements) // каждый прямоугольник
+			{
+				if (Inside(pl, j)) //точка внутри прямоугольника, не на границе
+				{
+					//передвигаемся за прямоугольник
+					if (j.x2 < MAIN_SIDE_WIDTH)
+					{
+						pl[0] = j.x2; //на следующую после этого прямоугольника
+					}
+					else { //или уже в начало следующей строки
+						pl[0] = 0;
+						++pl[1];
+					}
+					search_complited = false;
+					break;
+				}
+			}
+			if (search_complited)
+			{
+				return true;
+			}
+		}
+		//свободная точка обязана быть.
+		assert(false);
+		return false;
+	}
+	bool Fit(const RectanglePlacement& rect, const CalibronBox& rect_plasements) {
+		//вылез за границу
+		if ((rect.x2 > MAIN_SIDE_WIDTH) || (rect.y2 > MAIN_SIDE_WIDTH))
+		{
+			return false;
+		}
+		
+		for (const auto& it : rect_plasements) {
+			if (IsIntersect(it, rect))
+			{
+				return false;
+			}
+		}
 		return true;
 	}
-}
+
 
 //явное компилирование экземпляра шаблона
-template std::ostream& operator<<(std::ostream& out, const std::vector<Rectangle>& a);
+	template std::ostream& operator<<(std::ostream& out, const std::vector<Rectangle>& a);
+	template std::ostream& operator<<(std::ostream& out, const CalibronBox& a);
+	

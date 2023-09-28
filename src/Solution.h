@@ -3,13 +3,11 @@
 #include "rectangle.h"
 
 class Solution {
-	//количество прямоугольников вдоль краёв
-	unsigned number_ = 0;
-	RectangleSet rs_;
+	CalibronBox rectangles_;
 public:
 
 	Solution() = delete;
-	Solution(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned variation, unsigned number);
+	Solution(const CalibronBox &rectangles);
 	bool operator== (const Solution& other) const;
 	friend std::ostream& operator<<(std::ostream& out, const Solution& s);
 };
