@@ -2,7 +2,7 @@
 #include "render_rectangle.h"
 
 
-const coordinate PIXEL_PER_POINT = 5;
+const coordinate PIXEL_PER_POINT = 10;
 
 //svg::Color color1;                               // none
 //svg::Color color2 = svg::Rgb{ 215, 30, 25 };       // rgb(215,30,25)
@@ -29,7 +29,7 @@ void AddRectangle(Document& doc, const RectanglePlacement& rect)
 
     auto dx = rect.x2 - rect.x1;
     auto dy = rect.y2 - rect.y1;
-    string name = to_string(dx) + "x"s + to_string(dy);
+    string name_ = to_string(dx) + "x"s + to_string(dy);
     if (dx < dy)
     {
         auto temp = dx;
@@ -61,20 +61,13 @@ void AddRectangle(Document& doc, const RectanglePlacement& rect)
         .SetFillColor("white"s)
         .SetOffset({ 0, 6 })
         .SetFontWeight("bold"s)
-        .SetData(name));
-
+        .SetData(name_));
 }
 
-void Print(const CalibronBox& pl_set, std::vector<unsigned>& order, unsigned& variation)
+void Print(const CalibronBox& pl_set, unsigned& variation)
 {
-    string name_file(order.size(), ' ');
-    name_file.reserve(20);
-    for (size_t i = 0; i < order.size(); i++)
-    {
-        name_file[i] = 'A' + order[i];
-    }
-    //name_file = "svg/"s + name_file + to_string(variation);
-    name_file = name_file + to_string(variation);
+    static int begin_name_file = 0;
+    string name_file = "Calibron12_" + to_string(++begin_name_file);
     Document doc;
     auto fout = OpenOutputFile(name_file);
     RenderContext out(fout);
@@ -82,7 +75,5 @@ void Print(const CalibronBox& pl_set, std::vector<unsigned>& order, unsigned& va
         {
             AddRectangle(doc, j);
         }
-
     doc.Render(out);
-
 }

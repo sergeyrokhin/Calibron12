@@ -2,7 +2,9 @@
 
 
 const unsigned MAIN_SIDE_WIDTH = 56;
-const unsigned END_OF_VARIATION = (1 << 12); // 1 0000 0000 0000 в двоичной
+const unsigned NUMBER_OF_RECTANGLE = 12; 
+const unsigned END_OF_VARIATION = (1 << NUMBER_OF_RECTANGLE); // 1 0000 0000 0000 РІ РґРІРѕРёС‡РЅРѕР№
+
 
 std::ostream& operator<<(std::ostream& out, const Rectangle& c) {
 	out << '[' << c[0] << "x" << c[1] << ']';
@@ -86,40 +88,40 @@ bool RectanglePlacement::operator<(const RectanglePlacement& other) const
 
 
 unsigned GetNumberSide(unsigned variation, unsigned number) {
-	number = 12 - 1 - number;
+	number = NUMBER_OF_RECTANGLE - 1 - number;
 	auto side_number = (variation >> number) % 2;
 	return side_number;
 }
 
 unsigned TearTail(unsigned variation, unsigned number) {
-	//Перевороты последних разрядов не требуется
-	//старшие разряды (number) не трогаем, в хвосте нарисуем (12 - number)
+	//РџРµСЂРµРІРѕСЂРѕС‚С‹ РїРѕСЃР»РµРґРЅРёС… СЂР°Р·СЂСЏРґРѕРІ РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ
+	//СЃС‚Р°СЂС€РёРµ СЂР°Р·СЂСЏРґС‹ (number) РЅРµ С‚СЂРѕРіР°РµРј, РІ С…РІРѕСЃС‚Рµ РЅР°СЂРёСЃСѓРµРј (NUMBER_OF_RECTANGLE - number)
 	if (11 < number)
 	{
 		return variation;
 	}
 	unsigned variation_add = 1;
-	auto number_bit = 12 - number;
+	auto number_bit = NUMBER_OF_RECTANGLE - number;
 	for (size_t i = 0; i < number_bit; i++)
 	{
-		variation |= variation_add; //побитовое ИЛИ
-		variation_add <<= 1; //побитово сдвинуть на один разряд
+		variation |= variation_add; //РїРѕР±РёС‚РѕРІРѕРµ РР›Р
+		variation_add <<= 1; //РїРѕР±РёС‚РѕРІРѕ СЃРґРІРёРЅСѓС‚СЊ РЅР° РѕРґРёРЅ СЂР°Р·СЂСЏРґ
 	}
 	return variation;
 }
 
 bool Inside(const Placement& pl, const RectanglePlacement& rect_pl) {
-	return (rect_pl.x1 <= pl[0] && pl[0] < rect_pl.x2 && rect_pl.y1 <= pl[1] && pl[1] < rect_pl.y2); //точка внутри прямоугольника, не на границе
+	return (rect_pl.x1 <= pl[0] && pl[0] < rect_pl.x2 && rect_pl.y1 <= pl[1] && pl[1] < rect_pl.y2); //С‚РѕС‡РєР° РІРЅСѓС‚СЂРё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°, РЅРµ РЅР° РіСЂР°РЅРёС†Рµ
 }
 
 bool PlacementIsBusy(const Placement& pl, const Calibron12Box& cb) {
-	for (const auto& i : cb) //по каждой стороне
+	for (const auto& i : cb) //РїРѕ РєР°Р¶РґРѕР№ СЃС‚РѕСЂРѕРЅРµ
 	{
-		for (const auto& j : i) // каждый прямоугольник
+		for (const auto& j : i) // РєР°Р¶РґС‹Р№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 		{
 			if (Inside(pl, j))
 			{
-				return  true; //точка внутри прямоугольника, не на границе
+				return  true; //С‚РѕС‡РєР° РІРЅСѓС‚СЂРё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°, РЅРµ РЅР° РіСЂР°РЅРёС†Рµ
 			}
 		}
 	}
@@ -127,30 +129,30 @@ bool PlacementIsBusy(const Placement& pl, const Calibron12Box& cb) {
 }
 
 
-//возвращает Истина, если 
-//указывает на свободную точку
-//если точка занята, то сдвигает до свободной или за край, возвращая ложь
+//РІРѕР·РІСЂР°С‰Р°РµС‚ РСЃС‚РёРЅР°, РµСЃР»Рё 
+//СѓРєР°Р·С‹РІР°РµС‚ РЅР° СЃРІРѕР±РѕРґРЅСѓСЋ С‚РѕС‡РєСѓ
+//РµСЃР»Рё С‚РѕС‡РєР° Р·Р°РЅСЏС‚Р°, С‚Рѕ СЃРґРІРёРіР°РµС‚ РґРѕ СЃРІРѕР±РѕРґРЅРѕР№ РёР»Рё Р·Р° РєСЂР°Р№, РІРѕР·РІСЂР°С‰Р°СЏ Р»РѕР¶СЊ
 bool FirstFree(Placement& pl, bool vertically, const Calibron12Box& rect_plasements) {
-	//++pl[vertically];//вероятно стояли на занятой, двигаем на следующую позицию
+	//++pl[vertically];//РІРµСЂРѕСЏС‚РЅРѕ СЃС‚РѕСЏР»Рё РЅР° Р·Р°РЅСЏС‚РѕР№, РґРІРёРіР°РµРј РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ РїРѕР·РёС†РёСЋ
 	bool search_has_changed = true;
-	//определили точку, нужно её проверить. Это начало, 
-	// сюда следует вернуться, если точку сдвинем
+	//РѕРїСЂРµРґРµР»РёР»Рё С‚РѕС‡РєСѓ, РЅСѓР¶РЅРѕ РµС‘ РїСЂРѕРІРµСЂРёС‚СЊ. Р­С‚Рѕ РЅР°С‡Р°Р»Рѕ, 
+	// СЃСЋРґР° СЃР»РµРґСѓРµС‚ РІРµСЂРЅСѓС‚СЊСЃСЏ, РµСЃР»Рё С‚РѕС‡РєСѓ СЃРґРІРёРЅРµРј
 	while (search_has_changed && pl[vertically] < MAIN_SIDE_WIDTH)
 	{
-		search_has_changed = false; //если окажется свободной, то выйдем из цикла
-		for (int i = 0; i < 4 && !search_has_changed && pl[vertically] < MAIN_SIDE_WIDTH; i++) //по каждой стороне
+		search_has_changed = false; //РµСЃР»Рё РѕРєР°Р¶РµС‚СЃСЏ СЃРІРѕР±РѕРґРЅРѕР№, С‚Рѕ РІС‹Р№РґРµРј РёР· С†РёРєР»Р°
+		for (int i = 0; i < 4 && !search_has_changed && pl[vertically] < MAIN_SIDE_WIDTH; i++) //РїРѕ РєР°Р¶РґРѕР№ СЃС‚РѕСЂРѕРЅРµ
 		{
-			for (const auto& j : rect_plasements[i]) // каждый прямоугольник
+			for (const auto& j : rect_plasements[i]) // РєР°Р¶РґС‹Р№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 			{
-				if (Inside(pl, j)) //точка внутри прямоугольника, не на границе
+				if (Inside(pl, j)) //С‚РѕС‡РєР° РІРЅСѓС‚СЂРё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°, РЅРµ РЅР° РіСЂР°РЅРёС†Рµ
 				{
-					//передвигаемся за прямоугольник
-					pl[vertically] = (vertically ? j.y2 : j.x2); //на следующую после этого прямоугольника
-					//повтор цикла по i
+					//РїРµСЂРµРґРІРёРіР°РµРјСЃСЏ Р·Р° РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
+					pl[vertically] = (vertically ? j.y2 : j.x2); //РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ РїРѕСЃР»Рµ СЌС‚РѕРіРѕ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°
+					//РїРѕРІС‚РѕСЂ С†РёРєР»Р° РїРѕ i
 					i = -1;
 					search_has_changed = true;
-					//не свободный, передвинулись, значит нужно снова вернуться на
-					// начало цикла while 
+					//РЅРµ СЃРІРѕР±РѕРґРЅС‹Р№, РїРµСЂРµРґРІРёРЅСѓР»РёСЃСЊ, Р·РЅР°С‡РёС‚ РЅСѓР¶РЅРѕ СЃРЅРѕРІР° РІРµСЂРЅСѓС‚СЊСЃСЏ РЅР°
+					// РЅР°С‡Р°Р»Рѕ С†РёРєР»Р° while 
 					break;
 				}
 			}
@@ -159,38 +161,38 @@ bool FirstFree(Placement& pl, bool vertically, const Calibron12Box& rect_plaseme
 	return pl[vertically] < MAIN_SIDE_WIDTH;
 }
 
-//возвращает Истина, если 
-//указывает на ближайшую несвободную точку
-// но инвариант - края заняты, мы не выйдем за границу, 
-//если точка свободна, то сдвигает на следующую, возвращая ложь
+//РІРѕР·РІСЂР°С‰Р°РµС‚ РСЃС‚РёРЅР°, РµСЃР»Рё 
+//СѓРєР°Р·С‹РІР°РµС‚ РЅР° Р±Р»РёР¶Р°Р№С€СѓСЋ РЅРµСЃРІРѕР±РѕРґРЅСѓСЋ С‚РѕС‡РєСѓ
+// РЅРѕ РёРЅРІР°СЂРёР°РЅС‚ - РєСЂР°СЏ Р·Р°РЅСЏС‚С‹, РјС‹ РЅРµ РІС‹Р№РґРµРј Р·Р° РіСЂР°РЅРёС†Сѓ, 
+//РµСЃР»Рё С‚РѕС‡РєР° СЃРІРѕР±РѕРґРЅР°, С‚Рѕ СЃРґРІРёРіР°РµС‚ РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ, РІРѕР·РІСЂР°С‰Р°СЏ Р»РѕР¶СЊ
 bool LastFree(Placement& pl, bool vertically, const Calibron12Box& rect_plasements) {
-	//	++pl[vertically];//вероятно стояли на свободной, двигаем на следующую позицию
+	//	++pl[vertically];//РІРµСЂРѕСЏС‚РЅРѕ СЃС‚РѕСЏР»Рё РЅР° СЃРІРѕР±РѕРґРЅРѕР№, РґРІРёРіР°РµРј РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ РїРѕР·РёС†РёСЋ
 	while (pl[vertically] < MAIN_SIDE_WIDTH)
 	{
-		for (size_t i = 0; i < 4; i++) //по каждой стороне, пока не сменили точку проверки
+		for (size_t i = 0; i < 4; i++) //РїРѕ РєР°Р¶РґРѕР№ СЃС‚РѕСЂРѕРЅРµ, РїРѕРєР° РЅРµ СЃРјРµРЅРёР»Рё С‚РѕС‡РєСѓ РїСЂРѕРІРµСЂРєРё
 		{
-			for (const auto& j : rect_plasements[i]) // каждый прямоугольник
+			for (const auto& j : rect_plasements[i]) // РєР°Р¶РґС‹Р№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 			{
-				if (Inside(pl, j)) //точка внутри прямоугольника, не на границе
+				if (Inside(pl, j)) //С‚РѕС‡РєР° РІРЅСѓС‚СЂРё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°, РЅРµ РЅР° РіСЂР°РЅРёС†Рµ
 				{
-					//наткнулись на прямоугольник
+					//РЅР°С‚РєРЅСѓР»РёСЃСЊ РЅР° РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 					return true;
 				}
 			}
 		}
-		//следующую точку проверяем
+		//СЃР»РµРґСѓСЋС‰СѓСЋ С‚РѕС‡РєСѓ РїСЂРѕРІРµСЂСЏРµРј
 		++pl[vertically];
 	}
-	//поскольку по краям все должно быть занято, находясь внутри
-	//невозможно выйти за пределы поля.
+	//РїРѕСЃРєРѕР»СЊРєСѓ РїРѕ РєСЂР°СЏРј РІСЃРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р·Р°РЅСЏС‚Рѕ, РЅР°С…РѕРґСЏСЃСЊ РІРЅСѓС‚СЂРё
+	//РЅРµРІРѕР·РјРѕР¶РЅРѕ РІС‹Р№С‚Рё Р·Р° РїСЂРµРґРµР»С‹ РїРѕР»СЏ.
 	assert(false);
-	return false; //нашли
+	return false; //РЅР°С€Р»Рё
 }
 
 
-std::pair<unsigned, unsigned> GetRectangle(const RectangleSet& rs, const std::vector<unsigned>& order, unsigned variation, unsigned number)
+std::pair<unsigned, unsigned> GetRectangle(const RectangleSet& rs, unsigned variation, unsigned number)
 {
-	auto& rect = rs[order[number]];
+	auto& rect = rs[number];
 	auto side_num = GetNumberSide(variation, number);
 	return { rect[side_num], rect[(side_num + 1) % 2] };
 }
@@ -203,17 +205,17 @@ inline bool between(T x, T x1, T x2) {
 	}
 	return false;
 }
-// ИНВАРИАНТ для RectanglePlacement 
+// РРќР’РђР РРђРќРў РґР»СЏ RectanglePlacement 
 // x1 < x2, y1 < y2;
 bool IsIntersectAB(const RectanglePlacement& a, const RectanglePlacement& b)
 {
-	// a правее ИЛИ левее
+	// a РїСЂР°РІРµРµ РР›Р Р»РµРІРµРµ
 	if (a.x1 >= b.x2 || a.x2 <= b.x1)
 	{
 		return false;
 	}
-	// значит либо левый, либо правый угол a между b.x1 или b.x2
-	// и если хоть одна из горизонталей a находится между горизонталями b, значит есть пересечение
+	// Р·РЅР°С‡РёС‚ Р»РёР±Рѕ Р»РµРІС‹Р№, Р»РёР±Рѕ РїСЂР°РІС‹Р№ СѓРіРѕР» a РјРµР¶РґСѓ b.x1 РёР»Рё b.x2
+	// Рё РµСЃР»Рё С…РѕС‚СЊ РѕРґРЅР° РёР· РіРѕСЂРёР·РѕРЅС‚Р°Р»РµР№ a РЅР°С…РѕРґРёС‚СЃСЏ РјРµР¶РґСѓ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЏРјРё b, Р·РЅР°С‡РёС‚ РµСЃС‚СЊ РїРµСЂРµСЃРµС‡РµРЅРёРµ
 	if (between(a.y1, b.y1, b.y2))
 	{
 		return true;
@@ -228,12 +230,12 @@ bool IsIntersectAB(const RectanglePlacement& a, const RectanglePlacement& b)
 
 bool IsIntersect(const RectanglePlacement& a, const RectanglePlacement& b)
 {
-	// в нашем случае не может быть, когда одна полностью накрывает другую
-	// т.е. пересечение сторон необходимо и достаточно для несовместимости
-	// будем искать пересечения сторон
-	// Достаточно найти пересечение либо по вертикали, либо по горизонтали
-	// Если есть пересечение, то либо a пересекает b по горизонтали, либо b пересекает a
-	// Проверяем только вертикальное пересечение, a -> b потом b -> a
+	// РІ РЅР°С€РµРј СЃР»СѓС‡Р°Рµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ, РєРѕРіРґР° РѕРґРЅР° РїРѕР»РЅРѕСЃС‚СЊСЋ РЅР°РєСЂС‹РІР°РµС‚ РґСЂСѓРіСѓСЋ
+	// С‚.Рµ. РїРµСЂРµСЃРµС‡РµРЅРёРµ СЃС‚РѕСЂРѕРЅ РЅРµРѕР±С…РѕРґРёРјРѕ Рё РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґР»СЏ РЅРµСЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
+	// Р±СѓРґРµРј РёСЃРєР°С‚СЊ РїРµСЂРµСЃРµС‡РµРЅРёСЏ СЃС‚РѕСЂРѕРЅ
+	// Р”РѕСЃС‚Р°С‚РѕС‡РЅРѕ РЅР°Р№С‚Рё РїРµСЂРµСЃРµС‡РµРЅРёРµ Р»РёР±Рѕ РїРѕ РІРµСЂС‚РёРєР°Р»Рё, Р»РёР±Рѕ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+	// Р•СЃР»Рё РµСЃС‚СЊ РїРµСЂРµСЃРµС‡РµРЅРёРµ, С‚Рѕ Р»РёР±Рѕ a РїРµСЂРµСЃРµРєР°РµС‚ b РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё, Р»РёР±Рѕ b РїРµСЂРµСЃРµРєР°РµС‚ a
+	// РџСЂРѕРІРµСЂСЏРµРј С‚РѕР»СЊРєРѕ РІРµСЂС‚РёРєР°Р»СЊРЅРѕРµ РїРµСЂРµСЃРµС‡РµРЅРёРµ, a -> b РїРѕС‚РѕРј b -> a
 	//if (a.x2 <= MAIN_SIDE_WIDTH && a.y2 <= MAIN_SIDE_WIDTH && b.x2 <= MAIN_SIDE_WIDTH && b.y2 <= MAIN_SIDE_WIDTH)
 	//{
 		return (IsIntersectAB(a, b) || IsIntersectAB(b, a));
@@ -245,16 +247,16 @@ bool IsIntersect(const RectanglePlacement& a, const RectanglePlacement& b)
 		while (pl[1] < MAIN_SIDE_WIDTH)
 		{
 			bool search_complited = true;
-			for (const auto& j : rect_plasements) // каждый прямоугольник
+			for (const auto& j : rect_plasements) // РєР°Р¶РґС‹Р№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 			{
-				if (Inside(pl, j)) //точка внутри прямоугольника, не на границе
+				if (Inside(pl, j)) //С‚РѕС‡РєР° РІРЅСѓС‚СЂРё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°, РЅРµ РЅР° РіСЂР°РЅРёС†Рµ
 				{
-					//передвигаемся за прямоугольник
+					//РїРµСЂРµРґРІРёРіР°РµРјСЃСЏ Р·Р° РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 					if (j.x2 < MAIN_SIDE_WIDTH)
 					{
-						pl[0] = j.x2; //на следующую после этого прямоугольника
+						pl[0] = j.x2; //РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ РїРѕСЃР»Рµ СЌС‚РѕРіРѕ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°
 					}
-					else { //или уже в начало следующей строки
+					else { //РёР»Рё СѓР¶Рµ РІ РЅР°С‡Р°Р»Рѕ СЃР»РµРґСѓСЋС‰РµР№ СЃС‚СЂРѕРєРё
 						pl[0] = 0;
 						++pl[1];
 					}
@@ -267,12 +269,12 @@ bool IsIntersect(const RectanglePlacement& a, const RectanglePlacement& b)
 				return true;
 			}
 		}
-		//свободная точка обязана быть.
+		//СЃРІРѕР±РѕРґРЅР°СЏ С‚РѕС‡РєР° РѕР±СЏР·Р°РЅР° Р±С‹С‚СЊ.
 		assert(false);
 		return false;
 	}
 	bool Fit(const RectanglePlacement& rect, const CalibronBox& rect_plasements) {
-		//вылез за границу
+		//РІС‹Р»РµР· Р·Р° РіСЂР°РЅРёС†Сѓ
 		if ((rect.x2 > MAIN_SIDE_WIDTH) || (rect.y2 > MAIN_SIDE_WIDTH))
 		{
 			return false;
@@ -288,7 +290,7 @@ bool IsIntersect(const RectanglePlacement& a, const RectanglePlacement& b)
 	}
 
 
-//явное компилирование экземпляра шаблона
+//СЏРІРЅРѕРµ РєРѕРјРїРёР»РёСЂРѕРІР°РЅРёРµ СЌРєР·РµРјРїР»СЏСЂР° С€Р°Р±Р»РѕРЅР°
 	template std::ostream& operator<<(std::ostream& out, const std::vector<Rectangle>& a);
 	template std::ostream& operator<<(std::ostream& out, const CalibronBox& a);
 	

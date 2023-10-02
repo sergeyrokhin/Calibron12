@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+<polyline points="0,0 210,0 210,140 0,140 0,0" fill="rgba(168,112,140,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="10" y="10" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">21x14</text>
+<polyline points="210,0 420,0 420,140 210,140 210,0" fill="rgba(168,112,140,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="220" y="10" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">21x14</text>
+<polyline points="420,0 560,0 560,280 420,280 420,0" fill="rgba(224,112,168,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="430" y="10" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">14x28</text>
+<polyline points="0,140 320,140 320,240 0,240 0,140" fill="rgba(0,80,168,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="10" y="150" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">32x10</text>
+<polyline points="320,140 380,140 380,420 320,420 320,140" fill="rgba(224,48,136,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="330" y="150" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">6x28</text>
+<polyline points="380,140 420,140 420,280 380,280 380,140" fill="rgba(112,32,72,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="390" y="150" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">4x14</text>
+<polyline points="0,240 110,240 110,560 0,560 0,240" fill="rgba(0,88,172,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="10" y="250" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">11x32</text>
+<polyline points="110,240 320,240 320,420 110,420 110,240" fill="rgba(168,144,156,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="120" y="250" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">21x18</text>
+<polyline points="380,280 560,280 560,490 380,490 380,280" fill="rgba(168,144,156,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="390" y="290" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">18x21</text>
+<polyline points="110,420 280,420 280,560 110,560 110,420" fill="rgba(136,112,124,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="120" y="430" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">17x14</text>
+<polyline points="280,420 380,420 380,490 280,490 280,420" fill="rgba(80,56,68,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="290" y="430" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">10x7</text>
+<polyline points="280,490 560,490 560,560 280,560 280,490" fill="rgba(224,56,140,0.5)" stroke="rgb(0,0,0)" stroke-width = "5"/>
+<text x="290" y="500" dx="0" dy="6" font-size="12" font-family="Verdana" font-weight="bold" fill="white">28x7</text>
+</svg>

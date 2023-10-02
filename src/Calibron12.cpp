@@ -2,6 +2,7 @@
 #include <numeric>
 #include "Solution.h"
 #include "render_rectangle.h"
+#include "SimpleTimer.h"
 
 void FindSolutions()
 {
@@ -9,22 +10,24 @@ void FindSolutions()
 					 { 28,  6 }, { 32, 10 }, { 21, 18 }, { 21, 18 },
 					 { 10,  7 }, { 17, 14 }, { 28,  7 }, { 32, 11 } };
 
-	std::vector<unsigned> order(rs.size()); //перестановки
-	std::iota(order.begin(), order.end(), 0);
-
 	Solutions solutions;
 
-	std::cout << rs << std::endl;
+	std::sort(rs.begin(), rs.end());
+	std::cout << "The original set afte sort:\n" << rs << std::endl;
+	SimpleTimer timer("Calibron12");
+	int success_count = 0;
+	size_t number_of_attempts = 0;
 	do
 	{
 		auto number_max = 0u;
 		for (unsigned variation = 0; variation < END_OF_VARIATION; ++variation) //перебор переворачиванием
 		{
 			unsigned number = 0;
+			++number_of_attempts;
 			CalibronBox rect_plasements;
 			Placement point = { 0, 0 };
 			bool good = true;
-			while (12 > number)
+			while (NUMBER_OF_RECTANGLE > number)
 			{
 				if (number_max < number)
 				{
@@ -32,7 +35,7 @@ void FindSolutions()
 				}
 				NextFreePosition(point, rect_plasements);
 
-				auto [x, y] = GetRectangle(rs, order, variation, number);
+				auto [x, y] = GetRectangle(rs, variation, number);
 				Rectangle rect = { x, y };
 				auto new_rect_placement = RectanglePlacement(rect, point);
 
@@ -49,18 +52,21 @@ void FindSolutions()
 			{
 				if (solutions.Add(rect_plasements))
 				{
-					Print(rect_plasements, order, variation);
+					timer.Out(to_string(success_count));
+					Print(rect_plasements, variation);
 					std::cout << rect_plasements << std::endl;
 				}
 			}
 		}
-		if (++number_max < 11)
+		//если проверили первые number_max и все они не подходят для начала, то стоит отбросить весь хвост из рассмотрения
+		if (++number_max < (NUMBER_OF_RECTANGLE - 1)) //хвост должен быть размером больше 2
 		{
-			auto start_it = order.begin();
+			auto start_it = rs.begin();
 			std::advance(start_it, number_max);
-			std::sort(start_it, order.end(), [](auto a, auto b) { return a > b; });
+			std::sort(start_it, rs.end(), [](auto a, auto b) { return a > b; });
 		}
 
-	} while (std::next_permutation(order.begin(), order.end()));
+	} while (std::next_permutation(rs.begin(), rs.end()));
+	std::cout << "Number of attempts: " << number_of_attempts << std::endl;
 }
 

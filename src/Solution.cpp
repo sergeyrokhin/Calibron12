@@ -9,7 +9,7 @@ Solution::Solution(const CalibronBox& rectangles)
 }
 
 bool Solution::operator==(const Solution& other) const {
-	//хвост не анализируем, только те, что вдоль краёв
+	//С…РІРѕСЃС‚ РЅРµ Р°РЅР°Р»РёР·РёСЂСѓРµРј, С‚РѕР»СЊРєРѕ С‚Рµ, С‡С‚Рѕ РІРґРѕР»СЊ РєСЂР°С‘РІ
 	auto size = rectangles_.size();
 	if (size != other.rectangles_.size())
 	{

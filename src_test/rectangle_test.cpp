@@ -40,8 +40,8 @@ void TestIsIntersect() {
 		//	10		 +--------+	
 
 		RectanglePlacement A(0, 5, 0, 8), B(3, 9, 4, 10);
-		// B пересекает по горизонтали A
-		// И наоборот
+		// B РїРµСЂРµСЃРµРєР°РµС‚ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё A
+		// Р РЅР°РѕР±РѕСЂРѕС‚
 		assert(IsIntersectAB(A, B));
 		assert(IsIntersectAB(B, A));
 	}
@@ -58,8 +58,8 @@ void TestIsIntersect() {
 		//	8	+--------+ 
 
 		RectanglePlacement A(0, 5, 0, 8), B(3, 9, 4, 6);
-		// B пересекает по горизонтали A
-		// но не наоборот
+		// B РїРµСЂРµСЃРµРєР°РµС‚ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё A
+		// РЅРѕ РЅРµ РЅР°РѕР±РѕСЂРѕС‚
 		assert( ! IsIntersectAB(A, B));
 		assert(IsIntersectAB(B, A));
 	}
@@ -76,8 +76,8 @@ void TestIsIntersect() {
 		//	8	+--------+ 
 
 		RectanglePlacement A(0, 5, 0, 8), B(0, 9, 4, 6);
-		// B пересекает по горизонтали A
-		// но не наоборот
+		// B РїРµСЂРµСЃРµРєР°РµС‚ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё A
+		// РЅРѕ РЅРµ РЅР°РѕР±РѕСЂРѕС‚
 		assert( ! IsIntersectAB(A, B));
 		assert(IsIntersectAB(B, A));
 	}
@@ -94,8 +94,8 @@ void TestIsIntersect() {
 		//	8	+--------+ 
 
 		RectanglePlacement A(1, 5, 0, 8), B(0, 9, 4, 6);
-		// B пересекает по горизонтали A
-		// но не наоборот
+		// B РїРµСЂРµСЃРµРєР°РµС‚ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё A
+		// РЅРѕ РЅРµ РЅР°РѕР±РѕСЂРѕС‚
 		assert( ! IsIntersectAB(A, B));
 		assert(IsIntersectAB(B, A));
 	}
